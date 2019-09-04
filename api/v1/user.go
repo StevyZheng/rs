@@ -7,6 +7,11 @@ import (
 	"strconv"
 )
 
+//role添加
+func StoreRole(c *gin.Context) {
+
+}
+
 //列表数据
 func Users(c *gin.Context) {
 	var user model.User
@@ -24,7 +29,7 @@ func Users(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": 1,
-		"data":   result,
+		"data": result,
 	})
 }
 
@@ -43,7 +48,7 @@ func Store(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code":  1,
+		"code":    1,
 		"message": "添加成功",
 		"data":    id,
 	})
@@ -52,10 +57,10 @@ func Store(c *gin.Context) {
 //修改数据
 func Update(c *gin.Context) {
 	var user model.User
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 32)
 	user.Password = c.Request.FormValue("password")
 	result, err := user.Update(id)
-	if err != nil || result.ID == 0 {
+	if err != nil || result.UserID == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    -1,
 			"message": "修改失败",
@@ -63,8 +68,7 @@ func Update(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"code":  1,
+		"code":    1,
 		"message": "修改成功",
 	})
 }
-

@@ -1,11 +1,8 @@
 package utils
 
-import "strconv"
-
-type OrmModel struct {
-
-}
-
+import (
+	"strconv"
+)
 
 func StrToUint(strNumber string, value interface{}) (err error) {
 	var number interface{}

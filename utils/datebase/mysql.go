@@ -49,7 +49,7 @@ func (m *MysqlConnectPool) GetMysqlDB() (db_con *gorm.DB) {
 
 func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 	if !scope.HasError() {
-		nowTime := time.Now().Unix()
+		nowTime := gorm.NowFunc()
 		if createTimeField, ok := scope.FieldByName("CreatedAt"); ok {
 			if createTimeField.IsBlank {
 				_ = createTimeField.Set(nowTime)
@@ -66,7 +66,7 @@ func updateTimeStampForCreateCallback(scope *gorm.Scope) {
 
 func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
 	if _, ok := scope.Get("gorm:update_column"); !ok {
-		_ = scope.SetColumn("UpdatedAt", time.Now().Unix())
+		_ = scope.SetColumn("UpdatedAt", gorm.NowFunc())
 	}
 }
 
@@ -85,7 +85,7 @@ func deleteCallback(scope *gorm.Scope) {
 				"UPDATE %v SET %v=%v%v%v",
 				scope.QuotedTableName(),
 				scope.Quote(deletedOnField.DBName),
-				scope.AddToVars(time.Now().Unix()),
+				scope.AddToVars(gorm.NowFunc()),
 				addExtraSpaceIfExist(scope.CombinedConditionSql()),
 				addExtraSpaceIfExist(extraOption),
 			)).Exec()

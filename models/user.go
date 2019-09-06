@@ -2,34 +2,12 @@ package models
 
 import (
 	orm "rs/utils/datebase"
-	"time"
 )
-
-func DBInit() {
-	AutoMigrate()
-	orm.Eloquent.Model(&User{}).AddForeignKey("role_id", "roles(role_id)", "RESTRICT", "RESTRICT")
-}
-
-func AutoMigrate() {
-	orm.Eloquent.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Role{}, &User{})
-}
-
-type OrmModel struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeleteAt  time.Time
-}
-
-type Role struct {
-	OrmModel
-	RoleID   int64  `json:"id" gorm:"primary_key" sql:"AUTO_INCREMENT"`
-	RoleName string `json:"role_name" gorm:"type:varchar(32);index:idx_name_code"`
-}
 
 type User struct {
 	OrmModel
 	UserID   int64  `json:"id" gorm:"primary_key" sql:"AUTO_INCREMENT"`
-	UserName string `json:"user_name" gorm:"type:varchar(64)"`
+	UserName string `json:"user_name" gorm:"type:varchar(64);unique_index" `
 	Password string `json:"password" gorm:"type:varchar(256)"`
 	Email    string `json:"email" gorm:"type:varchar(128)"`
 	Role     Role   `json:"role" gorm:"foreignkey:RoleID"`
@@ -37,7 +15,7 @@ type User struct {
 }
 
 //列表
-func (user *User) Users() (users []User, err error) {
+func (user *User) UserList() (users []User, err error) {
 	if err = orm.Eloquent.Find(&users).Error; err != nil {
 		return
 	}
@@ -45,9 +23,12 @@ func (user *User) Users() (users []User, err error) {
 }
 
 //添加
-func (user User) Insert() (id int64, err error) {
+func (user User) UserInsert() (id int64, err error) {
 
 	//添加数据
+	if 0 == user.RoleID {
+		user.RoleID = GetRoleIDFromRoleName(user.Role.RoleName)
+	}
 	result := orm.Eloquent.Create(&user)
 	id = user.UserID
 	if result.Error != nil {
@@ -58,7 +39,7 @@ func (user User) Insert() (id int64, err error) {
 }
 
 //修改
-func (user *User) Update(user_id int64) (updateUser User, err error) {
+func (user *User) UserUpdate(user_id int64) (updateUser User, err error) {
 
 	if err = orm.Eloquent.Select([]string{"id", "username"}).First(&updateUser, user_id).Error; err != nil {
 		return
@@ -73,7 +54,7 @@ func (user *User) Update(user_id int64) (updateUser User, err error) {
 }
 
 //删除数据
-func (user *User) Destroy(user_id int64) (Result User, err error) {
+func (user *User) UserDestroy(user_id int64) (Result User, err error) {
 
 	if err = orm.Eloquent.Select([]string{"id"}).First(&user, user_id).Error; err != nil {
 		return

@@ -10,14 +10,24 @@ type User struct {
 	UserName string `json:"user_name" gorm:"type:varchar(64);unique_index" `
 	Password string `json:"password" gorm:"type:varchar(256)"`
 	Email    string `json:"email" gorm:"type:varchar(128)"`
-	Role     Role   `json:"role" gorm:"foreignkey:RoleID"`
+	Role     Role   `json:"role" gorm:"auto_preload;foreignkey:RoleID"`
 	RoleID   int64  `json:"role_id"`
 }
 
 //列表
 func (user *User) UserList() (users []User, err error) {
+	//orm.Eloquent.Model(&user).Related(&user.Role).Find(&user.Role)
 	if err = orm.Eloquent.Find(&users).Error; err != nil {
 		return
+	}
+	var r Role
+	for i, value := range users {
+		users[i].Role.RoleID = value.RoleID
+		orm.Eloquent.Where("role_id = ?", users[i].RoleID).First(&r)
+		users[i].Role.RoleName = r.RoleName
+		users[i].Role.CreatedAt = r.CreatedAt
+		users[i].Role.UpdatedAt = r.UpdatedAt
+		users[i].Role.DeleteAt = r.DeleteAt
 	}
 	return
 }
@@ -27,7 +37,7 @@ func (user User) UserInsert() (id int64, err error) {
 
 	//添加数据
 	if 0 == user.RoleID {
-		user.RoleID = GetRoleIDFromRoleName(user.Role.RoleName)
+		user.RoleID = user.Role.GetRoleIDFromRoleName(user.Role.RoleName)
 	}
 	result := orm.Eloquent.Create(&user)
 	id = user.UserID
@@ -41,10 +51,9 @@ func (user User) UserInsert() (id int64, err error) {
 //修改
 func (user *User) UserUpdate(user_id int64) (updateUser User, err error) {
 
-	if err = orm.Eloquent.Select([]string{"id", "username"}).First(&updateUser, user_id).Error; err != nil {
+	if err = orm.Eloquent.Select([]string{"user_id", "user_name"}).First(&updateUser, user_id).Error; err != nil {
 		return
 	}
-
 	//参数1:是要修改的数据
 	//参数2:是修改的数据
 	if err = orm.Eloquent.Model(&updateUser).Updates(&user).Error; err != nil {

@@ -6,7 +6,7 @@ import (
 
 type Role struct {
 	OrmModel
-	RoleID   int64  `json:"id" gorm:"primary_key" sql:"AUTO_INCREMENT"`
+	RoleID   int64  `json:"id" gorm:"primary_key;unique_index"`
 	RoleName string `json:"role_name" gorm:"type:varchar(32);unique_index;index:idx_name_code"`
 }
 
@@ -17,14 +17,12 @@ func (r *Role) RoleList() (roles []Role, err error) {
 	return
 }
 
-func GetRoleNameFromRoleID(role_id int64) (role_name string) {
-	var r Role
+func (r Role) GetRoleNameFromRoleID(role_id int64) (role_name string) {
 	orm.Eloquent.Where("role_id = ?", role_id).First(&r)
 	return r.RoleName
 }
 
-func GetRoleIDFromRoleName(roleName string) (role_id int64) {
-	var r Role
+func (r Role) GetRoleIDFromRoleName(roleName string) (role_id int64) {
 	orm.Eloquent.Where("role_name = ?", roleName).First(&r)
 	return r.RoleID
 }

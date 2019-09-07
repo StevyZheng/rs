@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"github.com/gin-gonic/gin"
+	"net/http"
 	"strconv"
 )
 
@@ -23,4 +25,24 @@ func StrToUint(strNumber string, value interface{}) (err error) {
 		}
 	}
 	return
+}
+
+var CodeMap map[int64]string
+
+func init() {
+	CodeMap = map[int64]string{
+		-1: "操作失败",
+		-2: "未找到相关信息",
+		-3: "json解析失败",
+		1:  "操作成功",
+	}
+}
+
+func JsonRequest(c *gin.Context, code int64, data interface{}, err error) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    code,
+		"message": CodeMap[code],
+		"error":   err,
+		"data":    data,
+	})
 }

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"rs/middelwares/jwt"
-	model "rs/models"
+	"rs/models"
 	"rs/utils"
 	orm "rs/utils/datebase"
 	"strconv"
@@ -20,11 +20,11 @@ type LoginInfo struct {
 
 type LoginResult struct {
 	Token string `json:"token"`
-	model.User
+	models.User
 }
 
-func LoginCheck(info LoginInfo) (flag bool, u model.User, err error) {
-	var user model.User
+func LoginCheck(info LoginInfo) (flag bool, u models.User, err error) {
+	var user models.User
 	if len(info.Username) == 0 || len(info.Password) == 0 {
 		return false, user, nil
 	}
@@ -56,7 +56,7 @@ func Login(c *gin.Context) {
 }
 
 // 生成令牌
-func generateToken(c *gin.Context, user model.User) {
+func generateToken(c *gin.Context, user models.User) {
 	j := &jwt.JWT{
 		SigningKey: []byte("newtrekWang"),
 	}
@@ -110,7 +110,7 @@ func GetDataByTime(c *gin.Context) {
 
 //列表数据
 func UserList(c *gin.Context) {
-	var user model.User
+	var user models.User
 	result, err := user.UserList()
 	if err != nil {
 		utils.JsonRequest(c, -2, nil, err)
@@ -130,7 +130,7 @@ type UserStoreInfo struct {
 func UserStore(c *gin.Context) {
 	var userInfo UserStoreInfo
 	err := c.ShouldBindJSON(&userInfo)
-	var user model.User
+	var user models.User
 	user.Role.RoleName = userInfo.RoleName
 	user.UserName = userInfo.UserName
 	user.Password = userInfo.Password
@@ -150,8 +150,9 @@ type UserUpdateInfo struct {
 
 //修改数据
 func UserUpdate(c *gin.Context) {
-	var user model.User
-	c.ShouldBind(user.UserID)
+	var user models.User
+	var userUpdateInfo UserUpdateInfo
+	err := c.ShouldBind(&userUpdateInfo)
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	user.Password = c.Request.FormValue("password")
 	result, err := user.UserUpdate(id)

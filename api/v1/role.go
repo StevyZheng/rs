@@ -16,13 +16,12 @@ func RoleList(c *gin.Context) {
 	utils.JsonRequest(c, 1, result, err)
 }
 
-//添加用户
+//添加角色
 func RoleStore(c *gin.Context) {
 	var role models.Role
-	err := c.ShouldBindJSON(&role.RoleName)
+	err := c.ShouldBindJSON(&role)
 	//role.RoleName = c.Request.FormValue("rolename")
 	id, err := role.RoleInsert()
-
 	if err != nil {
 		utils.JsonRequest(c, -1, nil, err)
 		return

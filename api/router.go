@@ -3,8 +3,8 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"rs/api/routers"
 	"rs/api/v1"
-	"rs/middelwares/jwt"
 )
 
 func InitRouter() *gin.Engine {
@@ -18,34 +18,19 @@ func InitRouter() *gin.Engine {
 			"version": "1.0",
 		})
 	})
+
 	apiV1 := router.Group("/api/v1")
 	apiV1.POST("/login", v1.Login)
 	apiV1.POST("/register", v1.UserStore)
 
 	apiDoc := apiV1.Group("/doc")
-	{
-		apiDoc.GET("/list", v1.ApiList)
-		apiDoc.POST("/add", v1.ApiStore)
-		apiDoc.POST("/del", v1.ApiDestroyFromID)
-	}
+	routers.ApiRouterInit(apiDoc)
 
 	apiRole := apiV1.Group("/role")
-	apiRole.Use(jwt.JWTAuth())
-	{
-		apiRole.GET("/list", v1.RoleList)
-		apiRole.GET("/get/:role_name", v1.RoleGetFromName)
-		apiRole.POST("/add", v1.RoleStore)
-		apiRole.POST("/del/:role_name", v1.RoleDestroyFromRoleName)
-	}
+	routers.RoleRouterInit(apiRole)
 
 	apiUser := apiV1.Group("/user")
-	apiUser.Use(jwt.JWTAuth())
-	{
-		apiUser.GET("/list", v1.UserList)
-		apiUser.GET("/get/:user_name", v1.UserGetFromName)
-		apiUser.POST("/add", v1.UserStore)
-		apiUser.POST("/del", v1.UserDestroyFromUserName)
-		apiUser.POST("/del/:user_name", v1.UserDestroy)
-	}
+	routers.UserRouterInit(apiUser)
+
 	return router
 }

@@ -14,7 +14,7 @@ import (
 )
 
 type LoginInfo struct {
-	Username string `json:"username"`
+	UserName string `json:"user_name"`
 	Password string `json:"password"`
 }
 
@@ -25,10 +25,10 @@ type LoginResult struct {
 
 func LoginCheck(info LoginInfo) (flag bool, u models.User, err error) {
 	var user models.User
-	if len(info.Username) == 0 || len(info.Password) == 0 {
+	if len(info.UserName) == 0 || len(info.Password) == 0 {
 		return false, user, nil
 	}
-	err = orm.Eloquent.Where("user_name = ?", info.Username).Preload("Role").First(&user).Error
+	err = orm.Eloquent.Where("user_name = ?", info.UserName).Preload("Role").First(&user).Error
 	if err != nil {
 		return false, user, err
 	}
@@ -108,6 +108,18 @@ func GetDataByTime(c *gin.Context) {
 	}
 }
 
+func UserGetFromName(c *gin.Context) {
+	var user models.User
+	userName := c.Param("user_name")
+	user.UserName = userName
+	role, err := user.UserGetFromName()
+	if err != nil {
+		utils.JsonRequest(c, -1, nil, err)
+		return
+	}
+	utils.JsonRequest(c, 1, role, err)
+}
+
 //列表数据
 func UserList(c *gin.Context) {
 	var user models.User
@@ -156,6 +168,28 @@ func UserUpdate(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	user.Password = c.Request.FormValue("password")
 	result, err := user.UserUpdate(id)
+	if err != nil || result.UserID == 0 {
+		utils.JsonRequest(c, -1, nil, err)
+		return
+	}
+	utils.JsonRequest(c, 1, nil, nil)
+}
+
+func UserDestroyFromUserName(c *gin.Context) {
+	var user models.User
+	err := c.ShouldBindJSON(&user)
+	result, err := user.UserDestroyFromName(user.UserName)
+	if err != nil || result.UserID == 0 {
+		utils.JsonRequest(c, -1, nil, err)
+		return
+	}
+	utils.JsonRequest(c, 1, nil, nil)
+}
+
+func UserDestroy(c *gin.Context) {
+	var user models.User
+	user.UserName = c.Param("user_name")
+	result, err := user.UserDestroyFromName(user.UserName)
 	if err != nil || result.UserID == 0 {
 		utils.JsonRequest(c, -1, nil, err)
 		return

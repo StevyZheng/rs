@@ -6,6 +6,18 @@ import (
 	"rs/utils"
 )
 
+func RoleGetFromName(c *gin.Context) {
+	var role models.Role
+	roleName := c.Param("role_name")
+	role.RoleName = roleName
+	role, err := role.RoleGetFromName()
+	if err != nil {
+		utils.JsonRequest(c, -1, nil, err)
+		return
+	}
+	utils.JsonRequest(c, 1, role, err)
+}
+
 func RoleList(c *gin.Context) {
 	var role models.Role
 	result, err := role.RoleList()

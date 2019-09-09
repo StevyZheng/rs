@@ -25,7 +25,7 @@ func GetInstance() *MysqlConnectPool {
 
 func init() {
 	var err error
-	Eloquent, err = gorm.Open("mysql", "root:000000@tcp(127.0.0.1:3306)/rs?charset=utf8&parseTime=True&loc=Local&timeout=10ms")
+	Eloquent, err = gorm.Open("mysql", "root:000000@tcp(127.0.0.1:3306)/rs?charset=utf8&parseTime=True&loc=Local&timeout=50ms")
 
 	if err != nil {
 		fmt.Printf("mysql connect error %v", err)
@@ -35,16 +35,16 @@ func init() {
 		fmt.Printf("database error %v", Eloquent.Error)
 	}
 
-	Eloquent.DB().SetMaxIdleConns(100)
-	Eloquent.DB().SetMaxOpenConns(1024)
+	Eloquent.DB().SetMaxIdleConns(1000)
+	Eloquent.DB().SetMaxOpenConns(10240)
 	Eloquent.DB().SetConnMaxLifetime(2 * time.Hour)
 	Eloquent.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
 	Eloquent.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)
 	Eloquent.Callback().Delete().Replace("gorm:delete", deleteCallback)
 }
 
-func (m *MysqlConnectPool) GetMysqlDB() (db_con *gorm.DB) {
-	return db_con
+func (m *MysqlConnectPool) GetMysqlDB() (dbCon *gorm.DB) {
+	return dbCon
 }
 
 func updateTimeStampForCreateCallback(scope *gorm.Scope) {
@@ -78,7 +78,8 @@ func deleteCallback(scope *gorm.Scope) {
 			extraOption = fmt.Sprint(str)
 		}
 
-		deletedOnField, hasDeletedOnField := scope.FieldByName("DeleteAt")
+		//deletedOnField, hasDeletedOnField := scope.FieldByName("DeletedAt")
+		deletedOnField, hasDeletedOnField := scope.FieldByName("DeletedTempAt")
 
 		if !scope.Search.Unscoped && hasDeletedOnField {
 			scope.Raw(fmt.Sprintf(

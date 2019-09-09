@@ -20,6 +20,7 @@ func InitRouter() *gin.Engine {
 	})
 	apiV1 := router.Group("/api/v1")
 	apiV1.POST("/login", v1.Login)
+	apiV1.POST("/register", v1.UserStore)
 
 	apiDoc := apiV1.Group("/doc")
 	{
@@ -32,14 +33,19 @@ func InitRouter() *gin.Engine {
 	apiRole.Use(jwt.JWTAuth())
 	{
 		apiRole.GET("/list", v1.RoleList)
+		apiRole.GET("/get/:role_name", v1.RoleGetFromName)
 		apiRole.POST("/add", v1.RoleStore)
+		apiRole.POST("/del/:role_name", v1.RoleDestroyFromRoleName)
 	}
 
 	apiUser := apiV1.Group("/user")
 	apiUser.Use(jwt.JWTAuth())
 	{
 		apiUser.GET("/list", v1.UserList)
+		apiUser.GET("/get/:user_name", v1.UserGetFromName)
 		apiUser.POST("/add", v1.UserStore)
+		apiUser.POST("/del", v1.UserDestroyFromUserName)
+		apiUser.POST("/del/:user_name", v1.UserDestroy)
 	}
 	return router
 }

@@ -15,9 +15,9 @@ func AutoMigrate() {
 }
 
 type OrmModel struct {
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	DeleteAt  time.Time `json:"delete_at"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"delete_at"`
 }
 
 /*type OrmModel struct {

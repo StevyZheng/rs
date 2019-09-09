@@ -6,9 +6,16 @@ import (
 
 type Role struct {
 	OrmModel
-	RoleID      int64  `json:"id" gorm:"primary_key;unique_index"`
-	RoleName    string `json:"role_name" gorm:"type:varchar(32);unique_index;index:idx_name_code"`
+	RoleID      int64  `json:"role_id" gorm:"primary_key;unique_index"`
+	RoleName    string `json:"role_name" gorm:"type:varchar(32);index:idx_name_code;unique_index"`
 	RoleDetails string `json:"role_details"`
+}
+
+func (r *Role) RoleGetFromName() (role Role, err error) {
+	if err = orm.Eloquent.Where("role_name = ?", r.RoleName).First(&role).Error; err != nil {
+		return
+	}
+	return
 }
 
 func (r *Role) RoleList() (roles []Role, err error) {
@@ -18,13 +25,13 @@ func (r *Role) RoleList() (roles []Role, err error) {
 	return
 }
 
-func (r Role) GetRoleNameFromRoleID(role_id int64) (role_name string) {
-	orm.Eloquent.Where("role_id = ?", role_id).First(&r)
+func (r Role) GetRoleNameFromRoleID(roleId int64) (roleName string) {
+	orm.Eloquent.Where("role_id = ?", roleId).First(&r)
 	return r.RoleName
 }
 
-func (r Role) GetRoleIDFromRoleName(roleName string) (role_id int64) {
-	orm.Eloquent.Where("role_name = ?", roleName).First(&r)
+func (r *Role) GetRoleIDFromRoleName(roleName string) (roleId int64) {
+	orm.Eloquent.Where("role_name = ?", roleName).First(r)
 	return r.RoleID
 }
 

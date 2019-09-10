@@ -6,8 +6,8 @@ import (
 
 type Role struct {
 	OrmModel
-	RoleID      int64  `json:"role_id" gorm:"primary_key;unique_index"`
-	RoleName    string `json:"role_name" gorm:"type:varchar(32);index:idx_name_code;unique_index"`
+	RoleID      int64  `json:"role_id" gorm:"primary_key"  sql:"AUTO_INCREMENT"`
+	RoleName    string `json:"role_name" gorm:"type:varchar(32);unique_index"`
 	RoleDetails string `json:"role_details"`
 }
 

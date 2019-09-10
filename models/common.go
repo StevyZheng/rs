@@ -11,7 +11,7 @@ func DBInit() {
 }
 
 func AutoMigrate() {
-	orm.Eloquent.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Conf{}, &Role{}, &User{}, &Api{})
+	orm.Eloquent.AutoMigrate(&Conf{}, &Role{}, &User{}, &Api{})
 }
 
 type OrmModel struct {

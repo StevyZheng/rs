@@ -17,7 +17,7 @@ type Net struct {
 	Interfaces arraylist.List
 }
 
-func (n Net) InitNet() {
+func (n *Net) InitNet() {
 	baseNicPath := "/sys/class/net/"
 	files, err := common.ListFiles(baseNicPath)
 	if err != nil {
@@ -25,9 +25,12 @@ func (n Net) InitNet() {
 	}
 	it := files.Iterator()
 	for it.Next() {
-		interfaceT := Interface{
-			Name: it.Value().(string),
+		nameTmp := it.Value().(string)
+		if nameTmp != "lo" {
+			interfaceT := Interface{
+				Name: nameTmp,
+			}
+			n.Interfaces.Add(interfaceT)
 		}
-		n.Interfaces.Add(interfaceT)
 	}
 }

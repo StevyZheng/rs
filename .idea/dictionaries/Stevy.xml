@@ -1,9 +1,12 @@
 <component name="ProjectDictionaryState">
   <dictionary name="Stevy">
     <words>
+      <w>autoincr</w>
       <w>gorm</w>
       <w>inno</w>
       <w>newtrek</w>
+      <w>pgsql</w>
+      <w>xorm</w>
     </words>
   </dictionary>
 </component>

@@ -4,12 +4,12 @@ import (
 	. "fmt"
 	"rs/api"
 	"rs/models"
-	orm "rs/utils/datebase"
+	"rs/utils/datebase/mysql"
 )
 
 func main() {
 	Println("rs is running...")
-	defer orm.Eloquent.Close()
+	defer mysql.Eloquent.Close()
 	models.DBInit()
 	router := api.InitRouter()
 	_ = router.Run(":80")

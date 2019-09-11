@@ -1,43 +1,34 @@
-package datebase
+package pgsql
 
 import (
 	"fmt"
-	//_ "github.com/go-sql-driver/mysql" //加载mysql
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"sync"
 	"time"
 )
 
-type MysqlConnectPool struct {
+type ConnectPool struct {
 }
 
-var instance *MysqlConnectPool
+var instance *ConnectPool
 var once sync.Once
-
 var Eloquent *gorm.DB
 
-func GetInstance() *MysqlConnectPool {
+func GetInstance() *ConnectPool {
 	once.Do(func() {
-		instance = &MysqlConnectPool{}
+		instance = &ConnectPool{}
 	})
 	return instance
 }
 
 func init() {
 	var err error
-	//Eloquent, err = gorm.Open("mysql", "root:000000@tcp(127.0.0.1:3306)/rs?charset=utf8&parseTime=True&loc=Local&timeout=50ms")
 	Eloquent, err = gorm.Open("postgres", "host=127.0.0.1 user=postgres dbname=rs sslmode=disable password=000000")
-
-	if err != nil {
-		fmt.Printf("mysql connect error %v", err)
+	if err != nil || Eloquent.Error != nil {
+		fmt.Printf("pgsql connect error %v", err)
 	}
-
-	if Eloquent.Error != nil {
-		fmt.Printf("database error %v", Eloquent.Error)
-	}
-
-	Eloquent.DB().SetMaxIdleConns(1000)
+	Eloquent.DB().SetMaxIdleConns(1024)
 	Eloquent.DB().SetMaxOpenConns(10240)
 	Eloquent.DB().SetConnMaxLifetime(2 * time.Hour)
 	Eloquent.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
@@ -45,7 +36,7 @@ func init() {
 	Eloquent.Callback().Delete().Replace("gorm:delete", deleteCallback)
 }
 
-func (m *MysqlConnectPool) GetMysqlDB() (dbCon *gorm.DB) {
+func (m *ConnectPool) GetPgsqlDB() (dbCon *gorm.DB) {
 	return dbCon
 }
 

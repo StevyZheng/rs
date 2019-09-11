@@ -60,8 +60,8 @@ func RoleDestroyFromID(c *gin.Context) {
 func RoleDestroyFromRoleName(c *gin.Context) {
 	var role models.Role
 	err := c.ShouldBindJSON(&role.RoleName)
-	//role.RoleName = c.Request.FormValue("rolename")
-	roleId := role.GetRoleIDFromRoleName(role.RoleName)
+	//role.RoleName = c.Request.FormValue("role_name")
+	roleId, err := role.GetRoleIDFromRoleName(role.RoleName)
 	_, err = role.RoleDestroy(roleId)
 	if err != nil {
 		utils.JsonRequest(c, -1, nil, err)

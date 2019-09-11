@@ -8,7 +8,7 @@ import (
 	"rs/middelwares/jwt"
 	"rs/models"
 	"rs/utils"
-	orm "rs/utils/datebase"
+	"rs/utils/datebase"
 	"strconv"
 	"time"
 )
@@ -28,7 +28,7 @@ func LoginCheck(info LoginInfo) (flag bool, u models.User, err error) {
 	if len(info.UserName) == 0 || len(info.Password) == 0 {
 		return false, user, nil
 	}
-	err = orm.Eloquent.Where("user_name = ?", info.UserName).Preload("Role").First(&user).Error
+	err = datebase.DB.Where("user_name = ?", info.UserName).Preload("Role").First(&user).Error
 	if err != nil {
 		return false, user, err
 	}

@@ -9,6 +9,7 @@ import (
 type Conf struct {
 	DBType     string
 	UploadPath string
+	OSType     string
 }
 
 var CodeMap map[int64]string
@@ -22,6 +23,7 @@ func init() {
 		1:  "操作成功",
 	}
 	ConfValue.DBType = "pgsql"
+	ConfValue.OSType = "windows"
 }
 
 func JsonRequest(c *gin.Context, code int64, data interface{}, err error) {

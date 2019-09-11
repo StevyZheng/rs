@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql" //加载mysql
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"rs/utils"
 	"sync"
 	"time"
 )
@@ -25,6 +26,12 @@ func GetInstance() *ConnectPool {
 }
 
 func init() {
+	if utils.ConfValue.DBType == "mysql" {
+		initMysqlDB()
+	}
+}
+
+func initMysqlDB() {
 	//Eloquent, err := xorm.NewEngine("mysql", "root:000000@tcp(127.0.0.1:3306)/rs?charset=utf8&parseTime=True&loc=Local&timeout=50ms")
 	//Eloquent, err = gorm.Open("postgres", "host=127.0.0.1 user=postgres dbname=rs sslmode=disable password=000000")
 	Eloquent, err := gorm.Open("mysql", "root:000000@tcp(127.0.0.1:3306)/rs?charset=utf8&parseTime=True&loc=Local&timeout=50ms")

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"rs/utils"
 	"sync"
 	"time"
 )
@@ -23,6 +24,12 @@ func GetInstance() *ConnectPool {
 }
 
 func init() {
+	if utils.ConfValue.DBType == "pgsql" {
+		initPgsqlDB()
+	}
+}
+
+func initPgsqlDB() {
 	var err error
 	Eloquent, err = gorm.Open("postgres", "host=127.0.0.1 user=postgres dbname=rs sslmode=disable password=000000")
 	if err != nil || Eloquent.Error != nil {

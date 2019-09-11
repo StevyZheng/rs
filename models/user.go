@@ -6,7 +6,7 @@ import (
 
 type User struct {
 	OrmModel
-	UserID   int64  `json:"user_id" gorm:"primary_key;unique_index"`
+	UserID   int64  `json:"user_id" gorm:"primary_key"`
 	UserName string `json:"user_name" gorm:"type:varchar(64);unique_index" `
 	Password string `json:"password" gorm:"type:varchar(256)"`
 	Email    string `json:"email" gorm:"type:varchar(128)"`
@@ -35,9 +35,9 @@ func (u *User) UserList() (users []User, err error) {
 	if err = datebase.DB.Find(&users).Error; err != nil {
 		return
 	}
-	var r Role
-	for i, value := range users {
-		users[i].Role.RoleID = value.RoleID
+	for i := range users {
+		var r Role
+		users[i].Role.RoleID = users[i].RoleID
 		datebase.DB.Where("role_id = ?", users[i].RoleID).First(&r)
 		users[i].Role.RoleName = r.RoleName
 		users[i].Role.RoleDetails = r.RoleDetails
